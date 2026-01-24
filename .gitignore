@@ -75,3 +75,11 @@ target/
 .Trashes
 ehthumbs.db
 Thumbs.db 
+
+# Docker
+.env.docker.local
+docker-compose.override.yml
+
+# Prisma
+/generated/prisma
+/prisma/generated

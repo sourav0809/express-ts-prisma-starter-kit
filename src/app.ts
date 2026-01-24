@@ -17,7 +17,7 @@ export const createApp = (): Application => {
 
   // Health check route
   app.get("/health", (req, res) => {
-    res.status(200).json({ status: "ok" });
+    res.status(200).json({ status: "healthy ! Thank you for checking" });
   });
 
   // Add your routes here

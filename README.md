@@ -4,117 +4,151 @@ A production-ready Node.js backend starter kit with TypeScript, featuring a well
 
 ## 🚀 Features
 
-- **TypeScript Integration** - Full TypeScript support for enhanced development experience
-- **Express.js** - Fast, unopinionated web framework for Node.js
-- **MongoDB Integration** - MongoDB database integration with Mongoose ODM
-- **Authentication** - JWT-based authentication system with bcrypt for password hashing
-- **Input Validation** - Request validation using Joi
-- **Security** - Enhanced security with Helmet middleware
-- **API Optimization** - Response compression for better performance
-- **CORS Support** - Configured Cross-Origin Resource Sharing
-- **Logging** - Structured logging with Winston
-- **Environment Management** - Environment variable management with dotenv
-- **Development Ready** - Hot-reloading with ts-node-dev
+- **TypeScript** - Full TypeScript support
+- **Express.js** - Fast, unopinionated web framework
+- **PostgreSQL + Prisma** - Type-safe database with Prisma ORM
+- **Authentication** - JWT-based auth with bcrypt
+- **Security** - Helmet, CORS, compression
+- **Logging** - Winston structured logging
+- **Docker** - Production-ready containerization
+- **Health Checks** - Built-in monitoring
 
 ## 📋 Prerequisites
 
-- Node.js (v14 or higher)
-- Typescript
-- npm or yarn
+**Docker (Recommended):**
+- Docker Engine 20.10+
+- Docker Compose 2.0+
 
-## 🛠️ Installation
+**Local Setup:**
+- Node.js v20+
+- PostgreSQL 12+
 
-1. Clone the repository:
+## 🚀 Quick Start
 
-   ```bash
-   git clone https://github.com/sourav0809/express-ts-starter-kit.git
-   cd express-ts-starter-kit
-   ```
+### With Docker (Recommended)
 
-2. Install dependencies:
+```bash
+# Clone the repo
+git clone https://github.com/sourav0809/express-ts-starter-kit.git
+cd express-ts-starter-kit
 
-   ```bash
-   npm install
-   ```
+# Start everything
+make up
 
-3. Set up environment variables:
+# View logs
+make logs
+```
 
-   ```bash
-   cp example.env .env
-   ```
+Your app is running at http://localhost:3000
 
-   Update the `.env` file with your configuration.
+### Without Docker
 
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
+```bash
+# Install dependencies
+npm install
+
+# Set up environment
+cp example.env .env
+# Edit .env with your database URL
+
+# Run migrations
+npm run migrations:dev
+
+# Start dev server
+npm run dev
+```
 
 ## 📁 Project Structure
 
 ```
 express-ts-starter-kit/
 ├── src/
-│   ├── config/         # Configuration setup
-│   ├── constant/       # Constants and enums
-│   ├── controllers/    # Request handlers
-│   ├── helpers/        # Helper utilities
-│   ├── middlewares/    # Custom middleware functions
-│   ├── models/         # MongoDB models
-│   ├── routes/         # API routes
-│   ├── services/       # Business logic
-│   ├── types/          # TypeScript type definitions
-│   ├── validations/    # Request validation schemas
-│   ├── app.ts          # Express app configuration
-│   └── index.ts        # Application entry point
-├── example.env         # Example environment variables
-├── tsconfig.json       # TypeScript configuration
-└── package.json        # Project dependencies and scripts
+│   ├── config/             # Configuration
+│   ├── middlewares/        # Express middlewares
+│   ├── types/              # TypeScript types
+│   ├── validations/        # Validation schemas
+│   ├── app.ts              # Express app setup
+│   └── index.ts            # Entry point
+├── prisma/
+│   ├── schema/             # Prisma schema files
+│   └── migrations/         # Database migrations
+├── Dockerfile              # Docker image
+├── docker-compose.yml      # Docker services
+└── Makefile                # Quick commands
 ```
 
-## 📜 Available Scripts
+## 🐳 Docker Commands
 
-- `npm run dev` - Start development server with hot reloading
-- `npm run build` - Build the project
-- `npm start` - Start the production server
-- `npm run lint` - Run ESLint for code linting
+```bash
+make up       # Start services
+make down     # Stop services
+make build    # Build and start
+make logs     # View logs
+make shell    # Access container
+make db       # Access database
+make migrate  # Run migrations
+make clean    # Remove everything
+```
 
-## 🔧 Dependencies
+Or use npm:
 
-### Main Dependencies
+```bash
+npm run docker:up      # Start
+npm run docker:down    # Stop
+npm run docker:build   # Build & start
+npm run docker:logs    # Logs
+```
 
-- express - Web framework
-- mongoose - MongoDB ODM
-- bcrypt - Password hashing
-- jsonwebtoken - JWT authentication
-- joi - Request validation
-- helmet - Security headers
-- compression - Response compression
-- cors - CORS support
-- dotenv - Environment management
-- winston - Logging
+## 📜 Scripts
 
-### Development Dependencies
+### Development
+- `npm run dev` - Start dev server with hot reload
+- `npm run build` - Build for production
+- `npm start` - Start production server
 
-- typescript - TypeScript support
-- ts-node-dev - Development server
-- @types/\* - TypeScript type definitions
+### Database
+- `npm run migrations:dev` - Run migrations
+- `npm run db:generate` - Generate Prisma client
+
+### Docker
+- `npm run docker:up` - Start Docker services
+- `npm run docker:down` - Stop Docker services
+- `npm run docker:build` - Build and start
+- `npm run docker:logs` - View logs
+
+## 🔧 Main Dependencies
+
+- **express** - Web framework
+- **@prisma/client** - Database ORM
+- **bcrypt** - Password hashing
+- **jsonwebtoken** - JWT auth
+- **joi** - Validation
+- **helmet** - Security
+- **winston** - Logging
 
 ## 🔐 Environment Variables
 
-Copy `example.env` to `.env` and update the values:
-
 ```env
 PORT=3000
-MONGODB_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
-NODE_ENV=development
+NODE_ENV=production
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
+JWT_SECRET=your_secret_here
+JWT_EXPIRES_IN=7d
+```
+
+For Docker, these are set in `docker-compose.yml`. For local dev, copy `example.env` to `.env`.
+
+## 🏥 Health Check
+
+```bash
+curl http://localhost:3000/health
+# {"status":"ok"}
 ```
 
 ## 📝 License
 
 ISC License
 
-## �� Author
+## 👤 Author
 
-- Sourav
+Sourav
