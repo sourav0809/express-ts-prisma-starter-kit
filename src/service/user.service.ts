@@ -118,6 +118,7 @@ class UserService {
           id: true,
           name: true,
           phoneNumber: true,
+          password: true,
         },
         where: {
           ...where,
@@ -135,6 +136,37 @@ class UserService {
       if (error instanceof ApiError) {
         throw error;
       }
+      throw new ApiError(500, `Failed to find user: ${error.message}`);
+    }
+  }
+
+  /**
+   * Find a single user by any condition (supports OR conditions)
+   * Returns null if not found (doesn't throw error)
+   * @param where - Where condition to find the user
+   * @param client - Optional transaction client
+   * @returns User or null if not found
+   */
+  async findOneByCondition(
+    where: PrismaTypes.UserWhereInput,
+    client: Prisma.TransactionClient = prisma
+  ) {
+    try {
+      return await client.user.findFirst({
+        select: {
+          email: true,
+          id: true,
+          name: true,
+          phoneNumber: true,
+          password: true,
+        },
+        where: {
+          ...where,
+          deletedAt: null,
+          status: UserStatus.ACTIVE
+        }
+      });
+    } catch (error: any) {
       throw new ApiError(500, `Failed to find user: ${error.message}`);
     }
   }

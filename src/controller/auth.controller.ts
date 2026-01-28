@@ -7,14 +7,14 @@ import bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import jwt from 'jsonwebtoken';
-
-import envConfig from '../config/config';
-import ERROR_MESSAGES from '../constants/error';
-import SUCCESS_MESSAGES from '../constants/success';
-import { AuthService, UserService } from '../services';
-import { LoginRequest } from '../types';
 import catchAsync from '../utils/catchAsync';
 import { response } from '../utils/response';
+import { LoginRequest, RegisterRequest } from '@/types';
+import userService from '@/service/user.service';
+import ERROR_MESSAGES from '@/constant/errorMessages';
+import { envConfig } from '@/config';
+import { SUCCESS_MESSAGES } from '@/constant';
+import { encryptPassword } from '@/utils/encryption';
 
 /**
  * Authenticate user with email and password
@@ -25,7 +25,7 @@ import { response } from '../utils/response';
 const login = catchAsync(async (req: Request, res: Response) => {
   const { email, password }: LoginRequest = req.body;
 
-  const user = await UserService.findOne({ email });
+  const user = await userService.findOne({ email });
 
   if (!user) {
     return response(res, 400, ERROR_MESSAGES.AUTH.INVALID_CREDENTIALS);
@@ -41,7 +41,6 @@ const login = catchAsync(async (req: Request, res: Response) => {
   const token = jwt.sign(
     {
       email: user.email,
-      role: user.role,
       userId: user.id
     },
     envConfig.security.secretKey,
@@ -54,29 +53,51 @@ const login = catchAsync(async (req: Request, res: Response) => {
       email: user.email,
       id: user.id,
       name: user.name,
-      role: user.role
     }
   };
 
   return response(res, httpStatus.OK, SUCCESS_MESSAGES.AUTH.LOGIN_SUCCESSFUL, result);
 });
 
+
+
 /**
- * Update user password
- * @param req - Express request object containing userId in params and new password in body
+ * Register user with email and password
+ * @param req - Express request object containing registration credentials
  * @param res - Express response object
- * @returns Response confirming password update
+ * @returns Response confirming user registration
  */
-const updatePassword = catchAsync(async (req: Request, res: Response) => {
-  const { userId } = req.params;
-  const { password } = req.body;
+const register = catchAsync(async (req: Request, res: Response) => {
+  const { email, password, phoneNumber, name }: RegisterRequest = req.body;
+  
+  // Check if a user exists with the same phone number or email
+  const user = await userService.findOneByCondition({
+    OR: [
+      { phoneNumber },
+      { email }
+    ]
+  });
 
-  const result = await AuthService.updatePassword(userId, password);
+  if (user) {
+    return response(res, 400, ERROR_MESSAGES.AUTH.USER_ALREADY_EXISTS);
+  }
 
-  response(res, httpStatus.OK, SUCCESS_MESSAGES.AUTH.PASSWORD_UPDATED, result);
+  const hashedPassword = await encryptPassword(password);
+
+  const newUser = await userService.create({ email, password: hashedPassword, phoneNumber, name });
+  
+  return response(res, httpStatus.CREATED, SUCCESS_MESSAGES.AUTH.REGISTER_SUCCESS, {
+    user: {
+      email: newUser.email,
+      id: newUser.id,
+      name: newUser.name,
+      phoneNumber: newUser.phoneNumber
+    }
+  });
 });
+
 
 export default {
   login,
-  updatePassword
+  register
 };
