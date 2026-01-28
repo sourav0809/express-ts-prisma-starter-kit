@@ -58,48 +58,6 @@ npm run migrations:dev
 npm run dev
 ```
 
-## 📁 Project Structure
-
-```
-express-ts-starter-kit/
-├── src/
-│   ├── config/             # Configuration
-│   ├── middlewares/        # Express middlewares
-│   ├── types/              # TypeScript types
-│   ├── validations/        # Validation schemas
-│   ├── app.ts              # Express app setup
-│   └── index.ts            # Entry point
-├── prisma/
-│   ├── schema/             # Prisma schema files
-│   └── migrations/         # Database migrations
-├── Dockerfile              # Docker image
-├── docker-compose.yml      # Docker services
-└── Makefile                # Quick commands
-```
-
-## 🐳 Docker Commands
-
-```bash
-make up       # Start services
-make down     # Stop services
-make build    # Build and start
-make logs     # View logs
-make shell    # Access container
-make db       # Access database
-make migrate  # Run migrations
-make clean    # Remove everything
-```
-
-Or use npm:
-
-```bash
-npm run docker:up      # Start
-npm run docker:down    # Stop
-npm run docker:build   # Build & start
-npm run docker:logs    # Logs
-```
-
-## 📜 Scripts
 
 ### Development
 - `npm run dev` - Start dev server with hot reload
