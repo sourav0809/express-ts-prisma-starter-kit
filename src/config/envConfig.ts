@@ -1,67 +1,53 @@
-import dotenv from "dotenv";
-import Joi from "joi";
+import * as dotenv from 'dotenv';
+import Joi from 'joi';
+
+import { SERVER_ENVIRONMENT } from '../constant';
 
 dotenv.config();
 
+const requiredForEnv = (schema: Joi.Schema<any>): Joi.Schema =>
+  schema.when('SERVER_ENV', {
+    is: Joi.valid(SERVER_ENVIRONMENT.TEST, SERVER_ENVIRONMENT.PRODUCTION),
+    then: Joi.required()
+  });
+
 const envVarsSchema = Joi.object()
   .keys({
-    NODE_ENV: Joi.string()
-      .valid("production", "development", "test")
-      .required(),
-    PORT: Joi.number().default(3000),
-    RATE_LIMIT_WINDOW_MS: Joi.number().default(20 * 60 * 1000),
-    RATE_LIMIT_MAX: Joi.number().default(500),
+    // auth 
+    BCRYPT_SALT_ROUNDS: Joi.string().optional(),
+    MASTER_PASSWORD: Joi.string().required(),
+
+    // database
+    DATABASE_URL: requiredForEnv(Joi.string().required()),
+    PORT: Joi.string().required(),
+    JWT_SECRET: Joi.string().required(),
+
+    // server
+    SERVER_ENV: Joi.string()
+      .valid(SERVER_ENVIRONMENT.DEVELOPMENT, SERVER_ENVIRONMENT.TEST, SERVER_ENVIRONMENT.PRODUCTION)
+      .required()
   })
   .unknown();
 
-const { value, error } = envVarsSchema
-  .prefs({ errors: { label: "key" } })
+const { error, value: envVars } = envVarsSchema
+  .prefs({ errors: { label: 'key' } })
   .validate(process.env);
 
-if (error) {
+if (error && process.env.SERVER_ENV !== SERVER_ENVIRONMENT.DEVELOPMENT) {
   throw new Error(`Config validation error: ${error.message}`);
 }
 
-interface EnvConfig {
-  nodeEnv: string;
-  port: number;
-  origin: string;
-  // db: {
-  //   name: string;
-  //   user: string;
-  //   password: string;
-  //   host: string;
-  //   port: number;
-  // };
-  // jwt: {
-  //   secret: string;
-  //   accessExpirationMinutes: number;
-  //   refreshExpirationDays: number;
-  // };
-  rateLimit: {
-    windowMs: number;
-    max: number;
-  };
-}
-
-export const envConfig: EnvConfig = {
-  nodeEnv: value.NODE_ENV,
-  port: value.PORT,
-  origin: "*",
-  // db: {
-  //   name: value.DB_NAME,
-  //   user: value.DB_USER,
-  //   password: value.DB_PASSWORD,
-  //   host: value.DB_HOST,
-  //   port: value.DB_PORT,
-  // },
-  // jwt: {
-  //   secret: value.JWT_SECRET,
-  //   accessExpirationMinutes: value.JWT_ACCESS_EXPIRATION_MINUTES,
-  //   refreshExpirationDays: value.JWT_REFRESH_EXPIRATION_DAYS,
-  // },
-  rateLimit: {
-    windowMs: value.RATE_LIMIT_WINDOW_MS,
-    max: value.RATE_LIMIT_MAX,
+export const envConfig = {
+  databaseUrl: envVars.DATABASE_URL,
+  security: {
+    bcryptSaltRounds: envVars.BCRYPT_SALT_ROUNDS || '12',
+    masterPassword: envVars.MASTER_PASSWORD,
+    secretKey: envVars.JWT_SECRET
   },
+  server: {
+    env: envVars.SERVER_ENV,
+    port: envVars.PORT
+  }
 };
+
+export default envConfig;

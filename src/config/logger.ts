@@ -1,7 +1,7 @@
 import winston from "winston";
 
 import { SERVER_ENVIRONMENT } from "../constant/common";
-import { envConfig } from "./envConfig";
+import envConfig from "./envConfig";
 
 /**
  * Enumerate error format
@@ -20,10 +20,10 @@ const enumerateErrorFormat = winston.format((info) => {
  * @type {winston.Logger}
  */
 const logger = winston.createLogger({
-  level: envConfig.nodeEnv === "development" ? "debug" : "info",
+  level: envConfig.server.env === SERVER_ENVIRONMENT.DEVELOPMENT ? "debug" : "info",
   format: winston.format.combine(
     enumerateErrorFormat(),
-    envConfig.nodeEnv === SERVER_ENVIRONMENT.DEVELOPMENT
+    envConfig.server.env === SERVER_ENVIRONMENT.DEVELOPMENT
       ? winston.format.colorize()
       : winston.format.uncolorize(),
     winston.format.splat(),

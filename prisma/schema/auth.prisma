@@ -2,6 +2,7 @@
   id        String   @id @default(uuid())
   name      String
   email     String   @unique
+  phoneNumber String? @unique
   password  String
   status    UserStatus   @default(ACTIVE)
   createdAt DateTime @default(now()) @map("created_at")
